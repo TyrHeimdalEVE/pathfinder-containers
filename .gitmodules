@@ -4,5 +4,7 @@
 	branch = master
 [submodule "websocket"]
 	path = websocket
-	url = https://github.com/TyrHeimdalEVE/pathfinder-websocket.git
+	url = https://github.com/TyrHeimdalEVE/pathfinder_websocket.git
+	branch = master
+[submodule "websockets"]
 	branch = master

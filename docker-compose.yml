@@ -46,21 +46,10 @@ services:
     build: '.'
     env_file:
     - .env
-    labels:
-      - "traefik.enable=true"
-      - "traefik.docker.network=web"
-      - "traefik.http.services.pf.loadbalancer.server.port=80"
-      - "traefik.http.routers.pf.rule=Host(`${DOMAIN}`)"
-      - "traefik.http.routers.pf.entrypoints=web"
-      - "traefik.http.routers.pf-secure.rule=Host(`${DOMAIN}`)"
-      - "traefik.http.routers.pf-secure.entrypoints=websecure"
-      - "traefik.http.routers.pf-secure.tls=true"
-      - "traefik.http.routers.pf-secure.tls.certresolver=letsencrypt"
-      - "traefik.http.middlewares.redirecthttps.redirectscheme.scheme=https"
-      - "traefik.http.routers.pf.middlewares=redirecthttps"
+    ports:
+      - ${EXPOSE_PORT}:80
     networks:
       - pf
-      - web
     healthcheck:
       disable: true
     volumes:
@@ -72,32 +61,6 @@ services:
       - pf-redis
       - pf-socket
     restart: always
-  traefik:
-    image: "traefik:v2.3"
-    container_name: "traefik"
-    command:
-      - "--log.level=ERROR"
-      - "--api.insecure=true"
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
-      - "--certificatesresolvers.letsencrypt.acme.httpchallenge=true"
-      - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
-      # Remove below line when ready for production
-      - "--certificatesresolvers.letsencrypt.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
-      - "--certificatesresolvers.letsencrypt.acme.email=MYEMAIL@someemailprobablygmail.com"
-      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
-    ports:
-      - "80:80"
-      - "443:443"
-      - "8080:8080"
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "${path}/letsencrypt:/letsencrypt"
-    networks:
-      - web
-    restart: always
 
 volumes:
      data:
@@ -105,5 +68,3 @@ volumes:
      redis_data:
 networks:
     pf:
-    web:
-       external: true
